@@ -1,10 +1,11 @@
 import { Router } from "express";
+import { getCustomerById, getCustomers, insertCustomer, updateCustomer } from "../controllers/customers.controllers";
 
 const customersRouter = Router()
 
-customersRouter.get("/customers")
-customersRouter.get("/customers/:id")
-customersRouter.post("/customers")
-customersRouter.post("/customers/:id")
+customersRouter.get("/customers", getCustomers)
+customersRouter.get("/customers/:id", getCustomerById)
+customersRouter.post("/customers", insertCustomer)
+customersRouter.post("/customers/:id", updateCustomer)
 
 export default customersRouter
