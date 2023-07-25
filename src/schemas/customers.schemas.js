@@ -1,6 +1,6 @@
 import joi, { string } from "joi"
 
-export const clientSchema = joi.object({
+export const customersSchema = joi.object({
     name: string().required(),
     phone: string().required(),
     cpf: string().required(),
