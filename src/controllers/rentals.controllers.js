@@ -52,7 +52,7 @@ export async function finishRental(req, res) {
             , [id])
         if (!rental.rowCount) return res.sendStatus(404)
         if (rental.rows[0].returnDate) return res.sendStatus(400)
-        const returnDate = dayjs("2023-08-04")
+        const returnDate = dayjs()
         const delayFee = (returnDate.diff(rental.rows[0].rentDate, "day") - rental.rows[0].daysRented) * rental.rows[0].pricePerDay
         await db.query(`UPDATE rentals SET "returnDate"=$1, "delayFee"=$2 WHERE id=$3;`, [returnDate, (delayFee > 0 ? delayFee : 0), id])
         res.sendStatus(200)
