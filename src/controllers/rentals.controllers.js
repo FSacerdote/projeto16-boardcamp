@@ -66,7 +66,7 @@ export async function deleteRental(req, res) {
     try {
         const rental = await db.query("SELECT * FROM rentals WHERE id=$1;", [id])
         if (!rental.rowCount) return res.status(404).send("O aluguel selecionado não existe")
-        if (!rental.rows[0].returnDate) return res.status(404).send("O aluguel não está fechado")
+        if (!rental.rows[0].returnDate) return res.status(400).send("O aluguel não está fechado")
         await db.query(`DELETE FROM rentals WHERE id=$1;`, [id])
         res.sendStatus(200)
     } catch (error) {
