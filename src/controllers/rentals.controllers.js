@@ -2,11 +2,18 @@ import dayjs from "dayjs"
 import { db } from "../database/database.connection.js"
 
 export async function getRentals(req, res) {
+    const {gameId, customerId} = req.query
+    console.log(gameId)
+    console.log(customerId)
     try {
         const rentals = await db.query(
-            `SELECT rentals.*, customers.id AS customer_id, customers.name AS customer_name, games.id AS game_id, games.name AS game_name FROM rentals
-            JOIN games ON rentals."gameId" = games.id
-            JOIN customers ON rentals."customerId" = customers.id;`
+                `SELECT rentals.*, customers.id AS customer_id, customers.name AS customer_name, games.id AS game_id, games.name AS game_name FROM rentals
+                JOIN games ON rentals."gameId" = games.id
+                JOIN customers ON rentals."customerId" = customers.id
+                WHERE
+                    (CAST($1 AS INTEGER) IS NULL OR rentals."customerId" = CAST($1 AS INTEGER))
+                    AND
+                    (CAST($2 AS INTEGER) IS NULL OR rentals."gameId" = CAST($2 AS INTEGER));`, [customerId, gameId]
         )
         res.send(rentals.rows.map(({ customer_id, customer_name, game_id, game_name, ...rental }) => ({
             ...rental,

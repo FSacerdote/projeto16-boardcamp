@@ -2,8 +2,10 @@ import dayjs from "dayjs"
 import { db } from "../database/database.connection.js"
 
 export async function getCustomers(req, res){
+    const {cpf} = req.query
+    const cpfPattern = `${cpf?cpf:""}%`
     try {
-        const customers = await db.query("SELECT id, name, phone, cpf, TO_CHAR(birthday, 'YYYY-MM-DD') AS birthday FROM customers;")
+        const customers = await db.query("SELECT id, name, phone, cpf, TO_CHAR(birthday, 'YYYY-MM-DD') AS birthday FROM customers WHERE cpf ILIKE $1;", [cpfPattern])
         res.send(customers.rows)
     } catch (error) {
         res.status(500).send(error.message)
