@@ -2,9 +2,11 @@ import dayjs from "dayjs"
 import { db } from "../database/database.connection.js"
 
 export async function getRentals(req, res) {
-    const {gameId, customerId, limit, offset} = req.query
+    const {gameId, customerId, limit, offset, order, desc} = req.query
+    let rentals
     try {
-        const rentals = await db.query(
+        if (order) {
+            const rentals = await db.query(
                 `SELECT rentals.*, customers.id AS customer_id, customers.name AS customer_name, games.id AS game_id, games.name AS game_name FROM rentals
                 JOIN games ON rentals."gameId" = games.id
                 JOIN customers ON rentals."customerId" = customers.id
@@ -12,8 +14,21 @@ export async function getRentals(req, res) {
                     (CAST($1 AS INTEGER) IS NULL OR rentals."customerId" = CAST($1 AS INTEGER))
                     AND
                     (CAST($2 AS INTEGER) IS NULL OR rentals."gameId" = CAST($2 AS INTEGER))
+                ORDER BY ${order} ${desc?"DESC":"ASC"}
                 LIMIT $3 OFFSET $4;`, [customerId, gameId, limit, offset]
         )
+        } else {
+            rentals = await db.query(
+                    `SELECT rentals.*, customers.id AS customer_id, customers.name AS customer_name, games.id AS game_id, games.name AS game_name FROM rentals
+                    JOIN games ON rentals."gameId" = games.id
+                    JOIN customers ON rentals."customerId" = customers.id
+                    WHERE
+                        (CAST($1 AS INTEGER) IS NULL OR rentals."customerId" = CAST($1 AS INTEGER))
+                        AND
+                        (CAST($2 AS INTEGER) IS NULL OR rentals."gameId" = CAST($2 AS INTEGER))
+                    LIMIT $3 OFFSET $4;`, [customerId, gameId, limit, offset]
+            )
+        }
         res.send(rentals.rows.map(({ customer_id, customer_name, game_id, game_name, ...rental }) => ({
             ...rental,
             customer: {
