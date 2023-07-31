@@ -6,7 +6,7 @@ export async function getGames(req, res){
     let games
     try {
         if(order){
-            games =  await db.query(`SELECT * FROM games WHERE name ILIKE $1 ORDER BY ${order} ${desc?"DESC":"ASC"} LIMIT $2 OFFSET $3 ;`, [namePattern, limit, offset])
+            games =  await db.query(`SELECT * FROM games WHERE name ILIKE $1 ORDER BY "${order}" ${desc?"DESC":"ASC"} LIMIT $2 OFFSET $3 ;`, [namePattern, limit, offset])
         }else{
             games =  await db.query(`SELECT * FROM games WHERE name ILIKE $1 LIMIT $2 OFFSET $3 ;`, [namePattern, limit, offset])
         }

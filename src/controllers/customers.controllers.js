@@ -10,7 +10,7 @@ export async function getCustomers(req, res){
             SELECT id, name, phone, cpf, TO_CHAR(birthday, 'YYYY-MM-DD') AS birthday 
             FROM customers 
             WHERE cpf ILIKE $1
-            ORDER BY ${order} ${desc?"DESC":"ASC"}
+            ORDER BY "${order}" ${desc?"DESC":"ASC"}
             LIMIT $2 OFFSET $3;`, 
             [cpfPattern, limit, offset])
         }else{

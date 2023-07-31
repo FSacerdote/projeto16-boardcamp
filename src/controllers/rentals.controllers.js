@@ -16,7 +16,7 @@ export async function getRentals(req, res) {
                     (CAST($1 AS INTEGER) IS NULL OR rentals."customerId" = CAST($1 AS INTEGER))
                     AND
                     (CAST($2 AS INTEGER) IS NULL OR rentals."gameId" = CAST($2 AS INTEGER))
-                ORDER BY ${order} ${desc?"DESC":"ASC"}
+                ORDER BY "${order}" ${desc?"DESC":"ASC"}
                 LIMIT $3 OFFSET $4;`, [customerId, gameId, limit, offset]
         )
         } else {
