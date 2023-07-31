@@ -1,12 +1,14 @@
 import dayjs from "dayjs"
 import { db } from "../database/database.connection.js"
+import isSameOrAfter from "dayjs/plugin/isSameOrAfter.js"
 
 export async function getRentals(req, res) {
-    const {gameId, customerId, limit, offset, order, desc} = req.query
+    dayjs.extend(isSameOrAfter)
+    const {gameId, customerId, limit, offset, order, desc, status, startDate} = req.query
     let rentals
     try {
         if (order) {
-            const rentals = await db.query(
+            rentals = await db.query(
                 `SELECT rentals.*, customers.id AS customer_id, customers.name AS customer_name, games.id AS game_id, games.name AS game_name FROM rentals
                 JOIN games ON rentals."gameId" = games.id
                 JOIN customers ON rentals."customerId" = customers.id
@@ -29,6 +31,9 @@ export async function getRentals(req, res) {
                     LIMIT $3 OFFSET $4;`, [customerId, gameId, limit, offset]
             )
         }
+        if(status === "open") rentals.rows = rentals.rows.filter((rental)=> !rental.returnDate)
+        if(status === "closed") rentals.rows = rentals.rows.filter((rental)=> rental.returnDate)
+        if(startDate) rentals.rows = rentals.rows.filter((rental)=> dayjs(rental.rentDate, "day").isSameOrAfter(startDate))
         res.send(rentals.rows.map(({ customer_id, customer_name, game_id, game_name, ...rental }) => ({
             ...rental,
             customer: {
